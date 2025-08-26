@@ -1,3 +1,4 @@
+package ej1;
 import java.util.Scanner;
 
 public class ModularLineal {
