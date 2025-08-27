@@ -7,7 +7,7 @@ public class TestCuadratica {
         double a = scanner.nextDouble();
         double b = scanner.nextDouble();
         double c = scanner.nextDouble();
-        Cuadratica ecuacion = new Cuadratica(a, b, c);
+        EcuacionLineal ecuacion = new EcuacionLineal(a, b, c);
         double discriminante = ecuacion.getDiscriminante();
 
         if (discriminante > 0) {

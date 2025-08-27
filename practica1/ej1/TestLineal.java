@@ -12,7 +12,7 @@ public class TestLineal {
         double e = scanner.nextDouble();
         double f = scanner.nextDouble();
 
-        Lineal ecuacion = new Lineal(a, b, c, d, e, f);
+       EcuacionLineal ecuacion = new EcuacionLineal(a, b, c, d, e, f);
 
         if (ecuacion.tieneSolucion()) {
             System.out.println("x = " + ecuacion.getX() + ", y = " + ecuacion.getY());

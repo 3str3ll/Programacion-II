@@ -1,9 +1,9 @@
 package ej2;
-public class Cuadratica {
+public class EcuacionLineal {
     private double a;
     private double b;
     private double c;
-    public Cuadratica(double a, double b, double c) {
+    public EcuacionLineal(double a, double b, double c) {
         this.a = a;
         this.b = b;
         this.c = c;
