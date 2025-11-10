@@ -1,0 +1,40 @@
+import java.util.ArrayList;
+
+public class Libro {
+    private String titulo;
+    private String isbn;
+    private ArrayList<Pagina> paginas;
+
+    public Libro(String titulo, String isbn, String[] contenidosPaginas) {
+        this.titulo = titulo;
+        this.isbn = isbn;
+        this.paginas = new ArrayList<>();
+        for (int i = 0; i < contenidosPaginas.length; i++) {
+            paginas.add(new Pagina(i + 1, contenidosPaginas[i]));
+        }
+        System.out.println("✓ Libro '" + titulo + "' creado con " + paginas.size() + " páginas");
+    }
+
+    public void leer() {
+        System.out.println("\n=== Leyendo libro: " + titulo + " ===");
+        for (Pagina pagina : paginas) {
+            pagina.mostrarContenido();
+        }
+    }
+
+    public void mostrarInfo() {
+        System.out.println("Libro: " + titulo + " (ISBN: " + isbn + ") - " + paginas.size() + " páginas");
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public ArrayList<Pagina> getPaginas() {
+        return paginas;
+    }
+
+    public String toString() {
+        return titulo + " (" + isbn + ")";
+    }
+}
