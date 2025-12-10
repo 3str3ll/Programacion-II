@@ -1,195 +1,145 @@
 package Persistencia.class1.ej1;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-
-import java.io.*;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.File;
 import java.util.ArrayList;
-
 public class Consultorio {
-    private String nombre;
-    private String diasAtencion;
-    private String horaApertura;
-    private String horaCierre;
-    private ArrayList<Medico> medicos;
-    private ArrayList<Consulta.Consulta> consultas;
-    private ArrayList<Consulta.Paciente> pacientes;
-    private static final String ARCHIVO_CONSULTORIO = "consultorio.json";
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private String consultas;  
+    private String medicos;    
 
-    public Consultorio(String nombre, String diasAtencion, String horaApertura, String horaCierre) {
-        this.nombre = nombre;
-        this.diasAtencion = diasAtencion;
-        this.horaApertura = horaApertura;
-        this.horaCierre = horaCierre;
-        this.medicos = new ArrayList<>();
-        this.consultas = new ArrayList<>();
-        this.pacientes = new ArrayList<>();
-        System.out.println(" Consultorio '" + nombre + "' creado con horario: " +
-                diasAtencion + " de " + horaApertura + " a " + horaCierre);
+    public Consultorio(String consultas, String medicos) {
+        this.consultas = consultas;
+        this.medicos = medicos;
+        
+        new File(consultas).mkdirs();
+        new File(medicos).mkdirs();
     }
+    public void darAlta() {
 
-    // Método para cargar datos desde archivo
-    public void cargarDatos() {
-        try {
-            File archivo = new File(ARCHIVO_CONSULTORIO);
-            if (archivo.exists()) {
-                Reader reader = Files.newBufferedReader(Paths.get(ARCHIVO_CONSULTORIO));
-                Type tipoConsultorio = new TypeToken<Consultorio>(){}.getType();
-                Consultorio consultorioCargado = gson.fromJson(reader, tipoConsultorio);
+        Medico m1 = new Medico(1, "Ana", "García", 12);
+        Medico m2 = new Medico(2, "Luis", "Martínez", 8);
+        Medico m3 = new Medico(3, "Carmen", "Rodríguez", 20);
 
-                // Copiar datos cargados
-                this.medicos = consultorioCargado.medicos;
-                this.consultas = consultorioCargado.consultas;
-                this.pacientes = consultorioCargado.pacientes;
+        m1.alta(medicos);
+        m2.alta(medicos);
+        m3.alta(medicos);
 
-                reader.close();
-                System.out.println("✓ Datos cargados exitosamente desde " + ARCHIVO_CONSULTORIO);
-            }
-        } catch (IOException e) {
-            System.out.println("No se encontraron datos previos, se iniciará un nuevo consultorio");
-        }
+        int ci = 1001;
+        new Consulta(ci++, "Juan", "Pérez", 1, 24, "Diciembre", 2024).alta(consultas);
+        new Consulta(ci++, "María", "López", 1, 15, "Enero", 2025).alta(consultas);
+        new Consulta(ci++, "Carlos", "Sánchez", 1, 25, "Diciembre", 2024).alta(consultas);
+        new Consulta(ci++, "Sofía", "Fernández", 2, 1, "Enero", 2025).alta(consultas);
+        new Consulta(ci++, "Pedro", "Gómez", 2, 10, "Febrero", 2025).alta(consultas);
+        new Consulta(ci++, "Laura", "Díaz", 2, 31, "Diciembre", 2024).alta(consultas);
+        new Consulta(ci++, "Miguel", "Ruiz", 3, 25, "Diciembre", 2024).alta(consultas);
+        new Consulta(ci++, "Elena", "Torres", 3, 1, "Enero", 2025).alta(consultas);
+        new Consulta(ci++, "Jorge", "Hernández", 3, 14, "Marzo", 2025).alta(consultas);
     }
+    public void darBaja(String nombreX, String apellidoY) {
+        System.out.println("\n=== b) DAR DE BAJA MÉDICO: " + nombreX + " " + apellidoY + " ===");
 
-    // Método para guardar datos en archivo
-    public void guardarDatos() {
-        try (FileWriter writer = new FileWriter(ARCHIVO_CONSULTORIO)) {
-            gson.toJson(this, writer);
-            System.out.println("✓ Datos guardados exitosamente en " + ARCHIVO_CONSULTORIO);
-        } catch (IOException e) {
-            System.out.println("✗ Error al guardar datos: " + e.getMessage());
-        }
-    }
+        ArrayList<Medico> listaMedicos = cargarMedicos();
+        int idBuscado = -1;
 
-    // Método para guardar copia de seguridad
-    public void guardarCopiaSeguridad(String nombreArchivo) {
-        try (FileWriter writer = new FileWriter(nombreArchivo)) {
-            gson.toJson(this, writer);
-            System.out.println("✓ Copia de seguridad guardada en " + nombreArchivo);
-        } catch (IOException e) {
-            System.out.println("✗ Error al guardar copia de seguridad: " + e.getMessage());
-        }
-    }
-
-    public void agregarMedico(Medico medico) {
-        medicos.add(medico);
-        System.out.println(" Médico '" + medico.getNombreCompleto() + "' agregado al consultorio");
-        guardarDatos();
-    }
-
-    public void agregarConsulta(Consulta.Consulta consulta) {
-        consultas.add(consulta);
-        System.out.println(" Consulta #" + consulta.getCi() + " agendada para " +
-                consulta.getNombrePaciente() + " " + consulta.getApellidoPaciente());
-        guardarDatos();
-    }
-
-    public void agregarPaciente(Consulta.Paciente paciente) {
-        pacientes.add(paciente);
-        System.out.println(" Paciente '" + paciente.getNombreCompleto() + "' registrado");
-        guardarDatos();
-    }
-
-    public void mostrarEstado() {
-        System.out.println("\n" + "=".repeat(60));
-        System.out.println("ESTADO DEL CONSULTORIO: " + nombre);
-        System.out.println("=".repeat(60));
-
-        System.out.println("Horario de atención: " + diasAtencion + " de " +
-                horaApertura + " a " + horaCierre);
-
-        System.out.println("\n--- Médicos registrados (" + medicos.size() + ") ---");
-        for (Medico medico : medicos) {
-            medico.mostrarInfo();
-        }
-
-        System.out.println("\n--- Pacientes registrados (" + pacientes.size() + ") ---");
-        for (Consulta.Paciente paciente : pacientes) {
-            paciente.mostrarInfo();
-        }
-
-        System.out.println("\n--- Consultas programadas (" + consultas.size() + ") ---");
-        for (Consulta.Consulta consulta : consultas) {
-            consulta.mostrarInfo();
-        }
-    }
-
-    // Método para buscar médico por nombre y apellido (para ejercicio b)
-    public Medico buscarMedico(String nombre, String apellido) {
-        for (Medico medico : medicos) {
-            if (medico.getNombreMed().equalsIgnoreCase(nombre) &&
-                    medico.getApellidoMed().equalsIgnoreCase(apellido)) {
-                return medico;
+        for (Medico m : listaMedicos) {
+            if (m.getNombreMed().equals(nombreX) && m.getApellidoMed().equals(apellidoY)) {
+                idBuscado = m.getIdMed();
+                m.baja(medicos);
+                System.out.println("Médico eliminado: " + m);
+                break;
             }
         }
-        return null;
-    }
-
-    // Método para dar de baja a un médico y sus consultas (ejercicio b)
-    public void darBajaMedico(String nombre, String apellido) {
-        Medico medico = buscarMedico(nombre, apellido);
-        if (medico != null) {
-            // Eliminar consultas asociadas
-            consultas.removeIf(consulta -> consulta.getIdMed() == medico.getIdMed());
-            // Eliminar médico
-            medicos.remove(medico);
-            System.out.println(" Médico '" + nombre + " " + apellido + "' y sus consultas eliminados");
-            guardarDatos();
+        if (idBuscado != -1) {
+            ArrayList<Consulta> listaConsultas = cargarConsultas();
+            for (Consulta c : listaConsultas) {
+                if (c.getIdMed() == idBuscado) {
+                    c.baja(consultas);
+                }
+            }
+            System.out.println("Consultas del médico también eliminadas");
         } else {
-            System.out.println(" No se encontró al médico " + nombre + " " + apellido);
+            System.out.println("Médico no encontrado");
         }
     }
+    public void cambioConsulta() {
 
-    // Método para cambiar día de consultas en navidad o año nuevo (ejercicio c)
-    public void cambiarConsultasFestivas() {
-        int cambios = 0;
-        for (Consulta.Consulta consulta : consultas) {
-            if (consulta.getMes().equalsIgnoreCase("Diciembre") && consulta.getDia() == 25) {
-                consulta.setDia(26); // Cambiar al 26 de Diciembre
-                cambios++;
-                System.out.println(" Consulta #" + consulta.getCi() + " reprogramada: Navidad → 26 Dic");
-            } else if (consulta.getMes().equalsIgnoreCase("Enero") && consulta.getDia() == 1) {
-                consulta.setDia(2); // Cambiar al 2 de Enero
-                cambios++;
-                System.out.println(" Consulta #" + consulta.getCi() + " reprogramada: Año Nuevo → 2 Ene");
+        ArrayList<Consulta> listaConsultas = cargarConsultas();
+
+        for (Consulta c : listaConsultas) {
+            boolean esNavidad = c.getDia() == 25 && c.getMes().equals("Diciembre");
+            boolean esAnoNuevo = c.getDia() == 1 && c.getMes().equals("Enero");
+
+            if (esNavidad || esAnoNuevo) {
+                int ciOriginal = c.getCi();
+                int diaOriginal = c.getDia();
+                c.setDia(c.getDia() + 1);
+
+                String rutaVieja = consultas + "/consulta_" + ciOriginal + ".json";
+                new File(rutaVieja).delete();
+
+                c.alta(consultas);
+
+                System.out.println("Consulta #" + ciOriginal + " reprogramada: " +
+                        diaOriginal + " → " + c.getDia());
             }
         }
-        if (cambios > 0) {
-            guardarDatos();
-        }
-        System.out.println(" Se reprogramaron " + cambios + " consultas festivas");
     }
+    public void ejercicioD(int diaCumple, String mesCumple) {
+        System.out.println("\n=== d) PACIENTES EN CUMPLEAÑOS (" + diaCumple + " " + mesCumple + ") ===");
 
-    // Método para mostrar pacientes en día de cumpleaños (ejercicio d)
-    public void mostrarPacientesEnCumpleaños(int dia, String mes) {
-        System.out.println("\n--- Pacientes con consulta en " + dia + " de " + mes + " ---");
+        ArrayList<Consulta> listaConsultas = cargarConsultas();
         boolean encontrados = false;
-        for (Consulta.Consulta consulta : consultas) {
-            if (consulta.getDia() == dia && consulta.getMes().equalsIgnoreCase(mes)) {
-                System.out.println(" • " + consulta.getNombrePaciente() + " " +
-                        consulta.getApellidoPaciente() + " con Dr. ID: " + consulta.getIdMed());
+
+        for (Consulta c : listaConsultas) {
+            if (c.getDia() == diaCumple && c.getMes().equals(mesCumple)) {
+                System.out.println("• " + c.getNombrePaciente() + " " + c.getApellidoPaciente());
                 encontrados = true;
             }
         }
+
         if (!encontrados) {
-            System.out.println(" No hay consultas programadas para esta fecha");
+            System.out.println("No hay consultas en esa fecha");
+        }
+    }
+    private ArrayList<Medico> cargarMedicos() {
+        ArrayList<Medico> lista = new ArrayList<>();
+        File carpeta = new File(medicos);
+        File[] archivos = carpeta.listFiles();
+
+        if (archivos != null) {
+            for (File f : archivos) {
+                Medico m = new Medico();
+                m.cargar(f.getPath());
+                lista.add(m);
+            }
+        }
+        return lista;
+    }
+
+    private ArrayList<Consulta> cargarConsultas() {
+        ArrayList<Consulta> lista = new ArrayList<>();
+        File carpeta = new File(consultas);
+        File[] archivos = carpeta.listFiles();
+
+        if (archivos != null) {
+            for (File f : archivos) {
+                Consulta c = new Consulta();
+                c.cargar(f.getPath());
+                lista.add(c);
+            }
+        }
+        return lista;
+    }
+    public void mostrarTodo() {
+        System.out.println("\n=== MÉDICOS ===");
+        for (Medico m : cargarMedicos()) {
+            System.out.println(m);
+        }
+
+        System.out.println("\n=== CONSULTAS ===");
+        for (Consulta c : cargarConsultas()) {
+            System.out.println(c);
         }
     }
 
-    // Getters para Gson
-    public String getNombre() { return nombre; }
-    public String getDiasAtencion() { return diasAtencion; }
-    public String getHoraApertura() { return horaApertura; }
-    public String getHoraCierre() { return horaCierre; }
-    public ArrayList<Medico> getMedicos() { return medicos; }
-    public ArrayList<Consulta.Consulta> getConsultas() { return consultas; }
-    public ArrayList<Consulta.Paciente> getPacientes() { return pacientes; }
-
-    public void cerrarConsultorio() {
-        System.out.println("\n Cerrando consultorio " + nombre + "...");
-        guardarDatos();
-    }
+    public String getConsultas() { return consultas; }
+    public String getMedicos() { return medicos; }
 }

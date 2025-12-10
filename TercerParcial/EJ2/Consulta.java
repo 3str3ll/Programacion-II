@@ -1,55 +1,89 @@
 package TercerParcial.EJ2;
 import com.google.gson.Gson;
-import java.io.FileWriter;
 import java.io.*;
-import com.google.gson.GsonBuilder;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class Consulta {
-        private int ci;
-        private String nombrePaciente;
-        private String apellidoPaciente;
-        private int idMed;
-        private int dia;
-        private String mes;
-        private int anio;
+    private int ci;
+    private String nombrePaciente;
+    private String apellidoPaciente;
+    private int idMed;
+    private int dia;
+    private String mes;
+    private int anio;
 
-        public Consulta(int ci, String nombrePaciente, String apellidoPaciente,
-                        int idMed, int dia, String mes, int anio) {
-            this.ci = ci;
-            this.nombrePaciente = nombrePaciente;
-            this.apellidoPaciente = apellidoPaciente;
-            this.idMed = idMed;
-            this.dia = dia;
-            this.mes = mes;
-            this.anio = anio;
-            System.out.println(" Consulta #" + ci + " creada para " + nombrePaciente + " " + apellidoPaciente);
-        }
+    public Consulta(int ci, String nombrePaciente, String apellidoPaciente,
+                    int idMed, int dia, String mes, int anio) {
+        this.ci = ci;
+        this.nombrePaciente = nombrePaciente;
+        this.apellidoPaciente = apellidoPaciente;
+        this.idMed = idMed;
+        this.dia = dia;
+        this.mes = mes;
+        this.anio = anio;
+    }
 
-        public void mostrarInfo() {
-            System.out.println("Cita #" + ci + " | Paciente: " + nombrePaciente + " " + apellidoPaciente +
-                    " | Médico ID: " + idMed + " | Fecha: " + dia + "/" + mes + "/" + anio);
-        }
-
-        // Getters para Gson
-        public int getCi() { return ci; }
-        public String getNombrePaciente() { return nombrePaciente; }
-        public String getApellidoPaciente() { return apellidoPaciente; }
-        public int getIdMed() { return idMed; }
-        public int getDia() { return dia; }
-        public String getMes() { return mes; }
-        public int getAnio() { return anio; }
-
-        // Setters para modificar datos
-        public void setDia(int dia) { this.dia = dia; }
-
-        @Override
-        public String toString() {
-            return "Consulta #" + ci + ": " + nombrePaciente + " " + apellidoPaciente +
-                    " - " + dia + "/" + mes + "/" + anio;
+    public Consulta() {
+        this.ci = -1;
+        this.nombrePaciente = "";
+        this.apellidoPaciente = "";
+        this.idMed = -1;
+        this.dia = -1;
+        this.mes = "";
+        this.anio = -1;
+    }
+    public void alta(String rutaCarpeta) {
+        String ruta = rutaCarpeta + "/consulta_" + ci + ".json";
+        Gson gson = new Gson();
+        try (FileWriter writer = new FileWriter(ruta)) {
+            gson.toJson(this, writer);
+            System.out.println("Consulta " + ci + " guardada");
+        } catch (IOException e) {
+            System.out.println("Error al guardar consulta: " + e.getMessage());
         }
     }
+    public void cargar(String rutaArchivo) {
+        Gson gson = new Gson();
+        try (FileReader reader = new FileReader(rutaArchivo)) {
+            Consulta temp = gson.fromJson(reader, Consulta.class);
+            this.ci = temp.ci;
+            this.nombrePaciente = temp.nombrePaciente;
+            this.apellidoPaciente = temp.apellidoPaciente;
+            this.idMed = temp.idMed;
+            this.dia = temp.dia;
+            this.mes = temp.mes;
+            this.anio = temp.anio;
+        } catch (IOException e) {
+            System.out.println("Error al cargar consulta: " + e.getMessage());
+        }
+    }
+    public void baja(String rutaCarpeta) {
+        String ruta = rutaCarpeta + "/consulta_" + ci + ".json";
+        File archivo = new File(ruta);
+        if (archivo.delete()) {
+            System.out.println("Consulta " + ci + " eliminada");
+        }
+    }
+    public int getCi() { return ci; }
+    public void setCi(int ci) { this.ci = ci; }
+    public String getNombrePaciente() { return nombrePaciente; }
+    public void setNombrePaciente(String nombrePaciente) { this.nombrePaciente = nombrePaciente; }
+    public String getApellidoPaciente() { return apellidoPaciente; }
+    public void setApellidoPaciente(String apellidoPaciente) { this.apellidoPaciente = apellidoPaciente; }
+    public int getIdMed() { return idMed; }
+    public void setIdMed(int idMed) { this.idMed = idMed; }
+    public int getDia() { return dia; }
+    public void setDia(int dia) { this.dia = dia; }
+    public String getMes() { return mes; }
+    public void setMes(String mes) { this.mes = mes; }
+    public int getAnio() { return anio; }
+    public void setAnio(int anio) { this.anio = anio; }
+
+    @Override
+    public String toString() {
+        return "Consulta #" + ci + ": " + nombrePaciente + " " + apellidoPaciente +
+                " | Médico ID: " + idMed + " | Fecha: " + dia + "/" + mes + "/" + anio;
+    }
+}
 
 
 

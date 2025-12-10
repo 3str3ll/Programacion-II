@@ -1,8 +1,7 @@
 package Persistencia.class1.ej1;
-import com.google.gson.Gson;
-import java.io.FileWriter;
 import java.io.*;
-public class  class Medico {
+
+public class Medico {
     private int idMed;
     private String nombreMed;
     private String apellidoMed;
@@ -13,26 +12,59 @@ public class  class Medico {
         this.nombreMed = nombreMed;
         this.apellidoMed = apellidoMed;
         this.aniosExperiencia = aniosExperiencia;
-        System.out.println(" Médico '" + nombreMed + " " + apellidoMed + "' registrado");
     }
 
-    public void mostrarInfo() {
-        System.out.println("Dr. " + nombreMed + " " + apellidoMed +
-                " - ID: " + idMed + " - Experiencia: " + aniosExperiencia + " años");
+    public Medico() {
+        this.idMed = -1;
+        this.nombreMed = "";
+        this.apellidoMed = "";
+        this.aniosExperiencia = -1;
+    }
+    public void alta(String rutaCarpeta) {
+        String ruta = rutaCarpeta + "/medico_" + idMed + ".txt";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(ruta))) {
+            writer.write(String.valueOf(idMed));
+            writer.newLine();
+            writer.write(nombreMed);
+            writer.newLine();
+            writer.write(apellidoMed);
+            writer.newLine();
+            writer.write(String.valueOf(aniosExperiencia));
+            System.out.println("Médico " + idMed + " guardado");
+        } catch (IOException e) {
+            System.out.println("Error al guardar médico: " + e.getMessage());
+        }
+    }
+    public void cargar(String rutaArchivo) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(rutaArchivo))) {
+            this.idMed = Integer.parseInt(reader.readLine());
+            this.nombreMed = reader.readLine();
+            this.apellidoMed = reader.readLine();
+            this.aniosExperiencia = Integer.parseInt(reader.readLine());
+        } catch (IOException e) {
+            System.out.println("Error al cargar médico: " + e.getMessage());
+        }
     }
 
-    public String getNombreCompleto() {
-        return nombreMed + " " + apellidoMed;
+    public void baja(String rutaCarpeta) {
+        String ruta = rutaCarpeta + "/medico_" + idMed + ".txt";
+        File archivo = new File(ruta);
+        if (archivo.delete()) {
+            System.out.println("Médico " + idMed + " eliminado");
+        }
     }
-
-    // Getters para Gson
     public int getIdMed() { return idMed; }
+    public void setIdMed(int idMed) { this.idMed = idMed; }
     public String getNombreMed() { return nombreMed; }
+    public void setNombreMed(String nombreMed) { this.nombreMed = nombreMed; }
     public String getApellidoMed() { return apellidoMed; }
+    public void setApellidoMed(String apellidoMed) { this.apellidoMed = apellidoMed; }
     public int getAniosExperiencia() { return aniosExperiencia; }
+    public void setAniosExperiencia(int aniosExperiencia) { this.aniosExperiencia = aniosExperiencia; }
 
     @Override
     public String toString() {
-        return "Dr. " + nombreMed + " " + apellidoMed + " (ID: " + idMed + ")";
+        return "Médico #" + idMed + ": Dr. " + nombreMed + " " + apellidoMed +
+                " | Experiencia: " + aniosExperiencia + " años";
     }
 }
